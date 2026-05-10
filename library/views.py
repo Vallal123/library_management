@@ -2,15 +2,17 @@ from rest_framework.views import APIView
 from .models import User, Book, Author, BorrowRecord
 from django.utils import timezone
 from datetime import datetime
-from .serializers import UserRegisterSerializer, BookListSerializer
+from .serializers import UserRegisterSerializer, BookListSerializer, UserLoginSerializer
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.generics import ListAPIView
 from django.db import transaction
 from rest_framework import status
-from pgvector.django import L2Distance
 from django.core.mail import send_mail
 from django.conf import settings
+import os
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth import authenticate
 
 class UserRegisterView(APIView):
     def post(self, request):
@@ -20,7 +22,7 @@ class UserRegisterView(APIView):
             try:
                 send_mail(
                     subject="Welcome to the Smart Library",
-                    message=f"Hi {user.first_name}, thanks for joining! Explore our AI-powered recommendations.",
+                    message=f"Hi {user.username}, thanks for joining! Explore our AI-powered recommendations.",
                     from_email=settings.EMAIL_HOST_USER,
                     recipient_list=[user.email],
                     fail_silently=False,
@@ -32,12 +34,31 @@ class UserRegisterView(APIView):
         
         return Response(serializer.errors, status=400)
     
+class UserLoginView(APIView):
+    
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+                'username': user.username,
+                'email': user.email
+            }, status=status.HTTP_200_OK)
+        return Response({"error": "Invalid Credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+        
 class BookListView(ListAPIView):
 
     permission_classes = [AllowAny]
     serializer_class = BookListSerializer
 
-    def get_queryset(self, request):
+    def get_queryset(self):
         return Book.objects.filter(is_active=True).prefetch_related('authors', 'genres')
 
 
