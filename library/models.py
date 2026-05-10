@@ -3,7 +3,8 @@ from django.core.validators import MinValueValidator
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
-
+import datetime
+from django.db.models import Q, F
 
 def get_upload_path(instance, filename):
     return f"books/{instance.isbn}_{filename}"
@@ -61,7 +62,17 @@ class Book(models.Model):
     class Meta:
         db_table = 'books'
         verbose_name = 'book'
-        verbose_name_plural = 'books'
+
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(available_copies__gte=0),
+                name='available_copies_non_negative'
+        ), 
+            models.CheckConstraint(
+                condition=Q(available_copies_lte=F('total_copies')),
+                name='available_lte_total'
+            ),
+    ]
 
     def __str__(self):
         return self.title
@@ -105,7 +116,6 @@ class BorrowRecord(models.Model):
     def save(self, *args, **kwargs):
 
         if not self.id and not self.due_date:
-            import datetime
             self.due_date = timezone.now() + datetime.timedelta(days=15)
 
         if self.return_date:
