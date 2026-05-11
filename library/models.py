@@ -69,7 +69,7 @@ class Book(models.Model):
                 name='available_copies_non_negative'
         ), 
             models.CheckConstraint(
-                condition=Q(available_copies_lte=F('total_copies')),
+                condition=Q(available_copies__lte=F('total_copies')),
                 name='available_lte_total'
             ),
     ]
