@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from .models import User, Book, Author, BorrowRecord
 from django.utils import timezone
 from datetime import datetime
-from .serializers import UserRegisterSerializer, BookListSerializer, UserLoginSerializer
+from .serializers import UserRegisterSerializer, BookListSerializer
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.generics import ListAPIView
@@ -30,7 +30,10 @@ class UserRegisterView(APIView):
             except Exception as e:
                 print(f"Email failed: {e}")
 
-            return Response(serializer.data, status=201)
+            return Response({
+                            "message": "User created successfully",
+                            "username": user.username,
+                            }, status=201)
         
         return Response(serializer.errors, status=400)
     
