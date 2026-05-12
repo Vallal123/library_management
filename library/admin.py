@@ -29,3 +29,8 @@ class BorrowRecordAdmin(admin.ModelAdmin):
 class AuthorAdmin(admin.ModelAdmin):
     list_display = ('name',)
     search_fields = ('name',)
+
+@admin.register(Genre)
+class GenreAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    search_fields = ('name',)
