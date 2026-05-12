@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Book, Author, Genre, User
+from .models import Book, Author, Genre, User, BorrowRecord
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -35,6 +35,16 @@ class BookListSerializer(serializers.ModelSerializer):
             'id', 'title', 'isbn', 'authors', 'genres',
             'available_copies', 'cover_image'
         ]
+
+class BorrowedBookSerializer(serializers.ModelSerializer):
+    user = serializers.SlugRelatedField(slug_field='username', read_only=True)
+    book = serializers.StringRelatedField(read_only=True)
+    class Meta:
+        model = BorrowRecord
+        fields = [
+            'id', 'user', 'book', 'borrow_date', 'due_date', 'return_date', 'is_returned', 
+        ]
+        read_only_fields = fields
 """
 class BookCreateSerializers(serializers.ModelSerializer):
     author = serializers.PrimaryKeyRelatedField(many=True, queryset=Author.objects.all())
