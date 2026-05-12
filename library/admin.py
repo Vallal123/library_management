@@ -5,7 +5,7 @@ from .models import Book, User, BorrowRecord, Author, Genre
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at', 'updated_at')
-    list_display = ('title', 'isbn', 'total_copies', 'available_copies', 'is_active')
+    list_display = ('id', 'title', 'isbn', 'total_copies', 'available_copies', 'is_active')
     list_filter = ('is_active', 'genres', 'created_at')
     search_fields = ('title', 'isbn')
     filter_horizontal = ('authors', 'genres')
