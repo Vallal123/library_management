@@ -1,5 +1,8 @@
 from django.urls import path
-from .views import UserRegisterView, BorrowBookView, ReturnBookView, BookListView
+from .views import (
+    UserRegisterView, BorrowBookView, 
+    ReturnBookView, BookListView, BorrowedBookView
+)
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -11,5 +14,6 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('books/<int:book_id>/borrow/', BorrowBookView.as_view(), name='borrow-book'),
     path('borrows/<int:borrow_id>/return/', ReturnBookView.as_view(), name='return-book'),
-    path('books/', BookListView.as_view(), name='book-list')
+    path('books/', BookListView.as_view(), name='book-list'),
+    path('user/borrowed_books/', BorrowedBookView.as_view(), name='borrowed_books')
 ]
