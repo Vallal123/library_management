@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from .models import User, Book, Author, BorrowRecord
 from django.utils import timezone
 from datetime import datetime
-from .serializers import UserRegisterSerializer, BookListSerializer
+from .serializers import UserRegisterSerializer, BookListSerializer, BorrowedBookSerializer
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.generics import ListAPIView
@@ -10,9 +10,9 @@ from django.db import transaction
 from rest_framework import status
 from django.core.mail import send_mail
 from django.conf import settings
-import os
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
+from .permissions import IsUser
 
 class UserRegisterView(APIView):
     def post(self, request):
@@ -73,6 +73,14 @@ class BorrowBookView(APIView):
             with transaction.atomic():
 
                 book = Book.objects.select_for_update().get(id=book_id)
+                
+                has_active_borrow = BorrowRecord.objects.filter(user=request.user, book=book)
+      
+
+                if has_active_borrow:
+                    return Response({
+                        'error': f'You currently have an unreturned copy of {book.title}'
+                    }, status=400)
 
                 if book.available_copies <= 0:
                     return Response(
@@ -133,3 +141,12 @@ class ReturnBookView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
+
+class BorrowedBookView(ListAPIView):
+
+    permission_classes = [IsAuthenticated, IsUser]
+    serializer_class = BorrowedBookSerializer
+
+    def get_queryset(self):
+        queryset = BorrowRecord.objects.filter(user=self.request.user).select_related('book', 'user')
+        return queryset
