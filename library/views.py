@@ -144,7 +144,7 @@ class ReturnBookView(APIView):
 
 class BorrowedBookView(ListAPIView):
 
-    permission_classes = [IsAuthenticated, IsUser]
+    permission_classes = [IsAuthenticated]
     serializer_class = BorrowedBookSerializer
 
     def get_queryset(self):
