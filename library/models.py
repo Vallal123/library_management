@@ -7,7 +7,8 @@ import datetime
 from django.db.models import Q, F
 
 def get_upload_path(instance, filename):
-    return f"books/{instance.isbn}_{filename}"
+    ext = filename.split('.')
+    return f"books/{instance.isbn}_{instance.title}.{ext[-1]}"
 
 class User(AbstractUser):
     email = models.EmailField(unique=True)
