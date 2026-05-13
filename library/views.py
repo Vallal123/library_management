@@ -18,6 +18,7 @@ from .pagination import BookPagination
 from .permissions import IsUser
 from .serializers import (BookListSerializer, BorrowedBookSerializer,
                           UserRegisterSerializer)
+from .tasks import send_welcome_email_task
 
 
 class UserRegisterView(APIView):
@@ -28,17 +29,9 @@ class UserRegisterView(APIView):
         serializer = UserRegisterSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            try:
-                send_mail(
-                    subject="Welcome to the Smart Library",
-                    message=f"Hi {user.username}, thanks for joining! Explore our AI-powered recommendations.",
-                    from_email=settings.EMAIL_HOST_USER,
-                    recipient_list=[user.email],
-                    fail_silently=False,
-                )
-            except Exception as e:
-                print(f"Email failed: {e}")
 
+            send_welcome_email_task.delay(user.id)
+            
             return Response({
                             "message": "User created successfully",
                             "username": user.username,

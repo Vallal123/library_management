@@ -1,10 +1,12 @@
-from django.db import models
-from django.core.validators import MinValueValidator
-from django.core.exceptions import ValidationError
-from django.utils import timezone
-from django.contrib.auth.models import AbstractUser
 import datetime
-from django.db.models import Q, F
+
+from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator
+from django.db import models
+from django.db.models import F, Q
+from django.utils import timezone
+
 
 def get_upload_path(instance, filename):
     ext = filename.split('.')

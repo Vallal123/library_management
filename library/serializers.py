@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Book, Author, Genre, User, BorrowRecord
+
+from .models import Author, Book, BorrowRecord, Genre, User
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):

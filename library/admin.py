@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Book, User, BorrowRecord, Author, Genre
+
+from .models import Author, Book, BorrowRecord, Genre, User
 
 
 @admin.register(Book)

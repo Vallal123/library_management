@@ -1,10 +1,12 @@
-from celery import shared_task
-from .email_services import EmailService
 import logging
+from datetime import timezone
+
+from celery import shared_task
 from django.conf import settings
 from django.core.mail import send_mail
-from datetime import timezone
 from django.template.loader import render_to_string
+
+from .email_services import EmailService
 
 logger = logging.getLogger(__name__)
 

@@ -1,12 +1,9 @@
 from django.urls import path
-from .views import (
-    UserRegisterView, BorrowBookView, 
-    ReturnBookView, BookListView, BorrowedBookView
-)
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
+from rest_framework_simplejwt.views import (TokenObtainPairView,
+                                            TokenRefreshView)
+
+from .views import (BookListView, BorrowBookView, BorrowedBookView,
+                    ReturnBookView, UserRegisterView)
 
 urlpatterns = [
     path('register/', UserRegisterView.as_view()),
