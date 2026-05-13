@@ -63,6 +63,7 @@ class Book(models.Model):
     class Meta:
         db_table = 'books'
         verbose_name = 'book'
+        verbose_name_plural = 'books'
 
         constraints = [
             models.CheckConstraint(
