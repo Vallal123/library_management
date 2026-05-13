@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 from datetime import timedelta
+from celery.schedules import crontab
 
 load_dotenv()
 
@@ -40,6 +41,7 @@ INSTALLED_APPS = [
     'library',
     'corsheaders',
     'drf_spectacular',
+    'django_celery_beat',  # Django admin UI for tasks
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -148,7 +150,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',),
     'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.AnnonRateThrottle',
+        'rest_framework.throttling.AnonRateThrottle',
         'rest_framework.throttling.UserRateThrottle',
         'rest_framework.throttling.ScopedRateThrottle',
     ],
@@ -194,3 +196,25 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
+
+#CELERY Configuration
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60 # 30 minutes
+
+CELERY_BEAT_SCHEDULE = {
+    'check-overdue-books-daily': {
+        'task': 'library.tasks.check_overdue_books',
+        'schedule': crontab(hour=0, minute=0) # Run at midnight
+    }
+}
+
+# config/settings.py
+if DEBUG:
+    CELERY_ALWAYS_EAGER = True  # Execute tasks immediately, don't queue
+    CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
