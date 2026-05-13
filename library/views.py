@@ -1,20 +1,29 @@
-from rest_framework.views import APIView
-from .models import User, Book, Author, BorrowRecord
-from django.utils import timezone
 from datetime import datetime
-from .serializers import UserRegisterSerializer, BookListSerializer, BorrowedBookSerializer
-from rest_framework.response import Response
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.generics import ListAPIView
-from django.db import transaction
-from rest_framework import status
-from django.core.mail import send_mail
+
 from django.conf import settings
-from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
+from django.core.mail import send_mail
+from django.db import transaction
+from django.utils import timezone
+from drf_spectacular.utils import extend_schema
+from rest_framework import status
+from rest_framework.generics import ListAPIView
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
+
+from .models import Author, Book, BorrowRecord, User
+from .pagination import BookPagination
 from .permissions import IsUser
+from .serializers import (BookListSerializer, BorrowedBookSerializer,
+                          UserRegisterSerializer)
+
 
 class UserRegisterView(APIView):
+
+    throttle_scope = 'auth'
+
     def post(self, request):
         serializer = UserRegisterSerializer(data=request.data)
         if serializer.is_valid():
@@ -40,6 +49,7 @@ class UserRegisterView(APIView):
 class UserLoginView(APIView):
     
     permission_classes = [AllowAny]
+    throttle_scope = 'auth'
 
     def post(self, request):
         username = request.data.get('username')
@@ -59,15 +69,24 @@ class UserLoginView(APIView):
 class BookListView(ListAPIView):
 
     permission_classes = [AllowAny]
+    throttle_scope = 'user'
     serializer_class = BookListSerializer
+    pagination_class = BookPagination
+
 
     def get_queryset(self):
         return Book.objects.filter(is_active=True).prefetch_related('authors', 'genres')
 
 
 class BorrowBookView(APIView):
+
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+            summary="Borrow a book",
+            description="Allows and authenticated user to borrow a copy of a book if available.",
+            responses={201: {"message": "Successfully borrowed..."}}
+    )
     def post(self, request, book_id):
         try:
             with transaction.atomic():
@@ -105,6 +124,7 @@ class BorrowBookView(APIView):
             return Response({"error": str(e)}, status=400)   
 
 class ReturnBookView(APIView):
+
     permission_classes = [IsAuthenticated]
 
     def post(self, request, borrow_id):
