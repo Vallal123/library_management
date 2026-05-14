@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 import os
 from datetime import timedelta
 from pathlib import Path
+import sys
 
 from celery.schedules import crontab
 from dotenv import load_dotenv
@@ -219,3 +220,9 @@ CELERY_BEAT_SCHEDULE = {
 if DEBUG:
     CELERY_ALWAYS_EAGER = True  # Execute tasks immediately, don't queue
     CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
+
+if 'test' in sys.argv:
+    REST_FRAMEWORK['DEFAULT_THROTTLE_CLASSES'] = []
+    REST_FRAMEWORK['DEFAULT_THROTTLE_RATE'] = {}
+    CELERY_ALWAYS_EAGER = False  # Execute tasks immediately, don't queue
+    CELERY_EAGER_PROPAGATES_EXCEPTIONS = False
