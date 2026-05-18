@@ -89,12 +89,6 @@ class Book(models.Model):
         self.available_copies -= requested
         self.save()
 
-    def clean(self):
-        if self.available_copies > self.total_copies:
-            raise ValidationError("Available copies can't exceed total copies")
-        if self.total_copies < 0:
-            raise ValidationError("Total copies can't be negative")
-
 class BorrowRecord(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='borrows')
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='borrow_records')
