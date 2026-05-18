@@ -86,7 +86,7 @@ class BorrowBookView(APIView):
 
                 book = Book.objects.select_for_update().get(id=book_id)
                 
-                has_active_borrow = BorrowRecord.objects.filter(user=request.user, book=book)
+                has_active_borrow = BorrowRecord.objects.filter(user=request.user, book=book, is_returned=False)
       
 
                 if has_active_borrow:
