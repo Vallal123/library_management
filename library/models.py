@@ -113,7 +113,7 @@ class BorrowRecord(models.Model):
     
     def is_overdue(self):
 
-        if self.is_returned == False and timezone.now() > self.due_date:
+        if not self.is_returned  and timezone.now() > self.due_date:
             return True
         return False
     
