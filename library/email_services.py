@@ -1,8 +1,7 @@
-import logging
-
-from django.conf import settings
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
+from django.conf import settings
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +31,6 @@ class EmailService:
                 recipient_list=[user.email],
                 fail_silently=False,
             )
-
             if email_count == 1:
                 logger.info(f"Welcome email sent to {user.email}")
                 return True
