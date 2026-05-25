@@ -1,8 +1,3 @@
-from datetime import datetime
-
-from django.conf import settings
-from django.contrib.auth import authenticate
-from django.core.mail import send_mail
 from django.db import transaction
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema
@@ -11,11 +6,9 @@ from rest_framework.generics import ListAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import Author, Book, BorrowRecord, User
+from .models import Book, BorrowRecord
 from .pagination import BookPagination
-from .permissions import IsUser
 from .serializers import (BookListSerializer, BorrowedBookSerializer,
                           UserRegisterSerializer)
 from .tasks import send_welcome_email_task
