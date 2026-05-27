@@ -4,3 +4,6 @@ __pycache__/
 *.pyc
 db.sqlite3
 media/
+# Celery beat schedule files
+celerybeat-schedule*
+celery-schedule*
