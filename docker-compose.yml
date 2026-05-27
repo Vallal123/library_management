@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   # PostgreSQL Database Service
   postgres:
@@ -17,7 +15,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
       # Checks if PostgreSQL is ready to accept connections
-      test: ["CMD-SHELL", "pg_isready -U ${USER}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${USER}" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -35,7 +33,7 @@ services:
       - redis_data:/data
     healthcheck:
       # Checks if Redis is responding to PING
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -146,7 +144,7 @@ volumes:
   postgres_data:
   redis_data:
 
-# Custom network: allows services to communicate by service name
+    # Custom network: allows services to communicate by service name
 networks:
   library_network:
     driver: bridge
