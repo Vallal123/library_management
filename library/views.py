@@ -12,18 +12,16 @@ from .pagination import BookPagination
 from .serializers import (BookListSerializer, BorrowedBookSerializer,
                           UserRegisterSerializer)
 from .tasks import send_welcome_email_task
-
+from .email_services import EmailService
 
 class UserRegisterView(APIView):
-
-    throttle_scope = 'auth'
 
     def post(self, request):
         serializer = UserRegisterSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
 
-            send_welcome_email_task.delay(user.id)
+            transaction.on_commit(lambda: send_welcome_email_task.delay(user.id))
             
             return Response({
                             "message": "User created successfully",

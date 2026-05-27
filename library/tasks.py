@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 @shared_task
 def send_welcome_email_task(user_id):
-    """Send welcom email asynchronously"""
+    """Send welcome email asynchronously"""
     from .models import User
     user = User.objects.get(id=user_id)
     return EmailService.send_welcome_email(user)

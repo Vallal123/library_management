@@ -21,7 +21,7 @@ class EmailService:
                 'explore_link': 'http://www.smartlibrary.com/books/',
             }
 
-            html_message = render_to_string('email/welcome_email.html', context)
+            html_message = render_to_string('emails/welcome_email.html', context)
 
             email_count = send_mail(
                 subject='Welcome to Smart Library! 📚',
@@ -52,7 +52,7 @@ class EmailService:
                 'book_title': book.title,
             }
         
-            html_message = render_to_string('email/borrow_confirmation.html', context)
+            html_message = render_to_string('emails/borrow_confirmation.html', context)
 
             email_count = send_mail(
                 subject=f'You borrowed "{book.title}"!',
